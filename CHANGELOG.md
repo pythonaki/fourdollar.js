@@ -22,3 +22,10 @@
 #### v0.1.3
 
 - [x] package.json 최종 버젼 반영
+
+
+#### v0.1.4
+
+- [x] 부 라이브러리 (unique, node, assert) 들 호출을 함수 방식으로 바꾸다.
+- [x] unit test 를 jasmine 에서 mocha로 바꾸다.
+- [x] assert#createSpy() 추가.

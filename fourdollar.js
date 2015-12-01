@@ -305,6 +305,7 @@ node = function () {
   };
 
 
+  $4.extend($4, node);
   return node;
 };
 
@@ -472,24 +473,59 @@ var unique = function () {
     return Date.now().toString(radix);
   };
 
+  $4.extend($4, unique);
   return unique;
 };
 
 
 
-$4.unique = unique();
-$4.extend($4, $4.unique);
+var assert = function () {
+  var assert = {};
+
+  // ##### 생성된 함수가 실행되는 지 확일할 수 있다.
+  // 
+  // it('실행되지 않았을 때 상태는 초기값과 같아야 한다.', function () {
+  //   var naverCall = $4.createSpy();
+  //   assert.deepEqual(naverCall.wasCalled, false);
+  //   assert.deepEqual(naverCall.count, 0);
+  // });
+  //
+  // it('실행되었을 때 올바른 값을 가져야 한다.', function () {
+  //   var mustCall = $4.createSpy();
+  //   mustCall();
+  //   assert.deepEqual(mustCall.wasCalled, true);
+  //   assert.deepEqual(mustCall.count, 1);
+  // });
+  assert.createSpy = function () {
+    var spy = function () {
+      spy.wasCalled = true;
+      spy.count++;
+    }
+    spy.wasCalled = false;
+    spy.count = 0;
+
+    return spy;
+  };
+
+  $4.extend($4, assert);
+  return assert;
+};
+
+
+
+$4.unique = unique;
+$4.assert = assert;
+
 
 if(typeof module === 'object' && typeof module.exports === 'object') { // CommonJS
-  $4.node = node();
-  $4.extend($4, $4.node);
+  $4.node = node;
   module.exports = $4;
 } else if(typeof define === 'function' && define.amd) {                // AMD
   define([], function() { return $4; });
 } else if(typeof window !== 'undefined') {                             // Browser
   window.$4 = $4;
 } else {
-  throw Error('sh1 requires a CommonJS or a AMD or a window.');
+  throw Error('fourdollar requires a CommonJS or a AMD or a window.');
 }
 
 
