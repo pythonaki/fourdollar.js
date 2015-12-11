@@ -304,6 +304,31 @@ node = function () {
     });
   };
 
+  // #### then()에 여러개의 인수 전달.
+  // ```js
+  // before(function () {
+  //   return _exists(dmpPath)
+  //   .then(function (exists) {
+  //     return $4._delivery(_readFile(dmpPath), 'data', {exists: exists});
+  //   })
+  //   .then(function (args_) {
+  //     args = args_;
+  //   });
+  // });
+  //
+  // it('then()에 여러개의 arg를 받을 수 있다.', function () {
+  //   assert.equal(args.exists, true);
+  //   assert.equal(args.data, 'Hello World!!\n');
+  // });
+  // ```
+  node._delivery = function (resolve, name, args) {
+    return resolve
+    .then(function (result) {
+      args[name] = result;
+      return args;
+    });
+  };
+
 
   $4.extend($4, node);
   return node;
@@ -483,7 +508,7 @@ var assert = function () {
   var assert = {};
 
   // ##### 생성된 함수가 실행되는 지 확일할 수 있다.
-  // 
+  //
   // it('실행되지 않았을 때 상태는 초기값과 같아야 한다.', function () {
   //   var naverCall = $4.createSpy();
   //   assert.deepEqual(naverCall.wasCalled, false);

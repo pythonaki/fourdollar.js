@@ -29,3 +29,8 @@
 - [x] 부 라이브러리 (unique, node, assert) 들 호출을 함수 방식으로 바꾸다.
 - [x] unit test 를 jasmine 에서 mocha로 바꾸다.
 - [x] assert#createSpy() 추가.
+
+
+#### v0.1.5
+
+- [x] node#delivery :: then()에 여러개의 인수 전달.

@@ -10,7 +10,7 @@ var path = require('path');
 var process = require('process');
 
 describe('fourdollar', function () {
-  describe('#makePromise()', function () {
+  describe('makePromise()', function () {
     var _readFile = $4.makePromise(fs.readFile);
 
     it('fs.readFile를 Promise로 변경할 수 있다', function () {
@@ -55,7 +55,7 @@ describe('fourdollar', function () {
   });
 
 
-  describe('#extend()', function () {
+  describe('extend()', function () {
     it('객체를 확장할 수 있다.', function () {
       var objA = {hello: 'hello', world: 'world'};
       var objB = {foo: 'foo', bar: 'bar'};
@@ -68,7 +68,7 @@ describe('fourdollar', function () {
   });
 
 
-  describe('assert#createSpy()', function () {
+  describe('assert.createSpy()', function () {
     it('실행되지 않았을 때 상태는 초기값과 같아야 한다.', function () {
       var naverCall = $4.createSpy();
       assert.deepEqual(naverCall.wasCalled, false);
@@ -85,7 +85,7 @@ describe('fourdollar', function () {
 
 
   $4.node();
-  describe('node#mergeBuffers()', function () {
+  describe('node.mergeBuffers()', function () {
     var buf1 = new Buffer('foo');
     var buf2 = new Buffer('bar');
     var buf3 = new Buffer('!!');
@@ -117,7 +117,7 @@ describe('fourdollar', function () {
   // });
 
 
-  describe('node#_constructDir()', function () {
+  describe('node._constructDir()', function () {
     var _exists = $4.makePromise(fs.exists, false);
     var _rmdir = $4.makePromise(fs.rmdir);
 
@@ -147,7 +147,7 @@ describe('fourdollar', function () {
   });
 
 
-  describe('node#_getRemoteData()', function () {
+  describe('node._getRemoteData()', function () {
     var catchCallback = $4.createSpy();
 
     before(function () {
@@ -168,7 +168,7 @@ describe('fourdollar', function () {
   });
 
 
-  describe('node#_download()', function () {
+  describe('node._download()', function () {
     var uri = 'https://raw.githubusercontent.com/bynaki/fourdollar.js/v0.1/resource/ironman.jpg';
     var filename = path.resolve(__dirname, '../tmp/ironman.jpg');
     var _exists = $4.makePromise(fs.exists, false);
@@ -204,7 +204,7 @@ describe('fourdollar', function () {
   });
 
 
-  describe('node#_download2()', function () {
+  describe('node._download2()', function () {
     var uri = 'https://raw.githubusercontent.com/bynaki/fourdollar.js/v0.1/resource/ironman.jpg';
     var filename = path.resolve(__dirname, '../tmp/ironman.jpg');
     var _exists = $4.makePromise(fs.exists, false);
@@ -236,6 +236,29 @@ describe('fourdollar', function () {
       .then(function () {
         assert.ok(catchCallback.wasCalled);
       });
+    });
+  });
+
+
+  describe('node._delivery', function () {
+    var _exists = $4.makePromise(fs.exists, false);
+    var _readFile = $4.makePromise(fs.readFile);
+    var dmpPath = path.resolve(__dirname, '../resource/dmp01.txt');
+    var args;
+
+    before(function () {
+      return _exists(dmpPath)
+      .then(function (exists) {
+        return $4._delivery(_readFile(dmpPath), 'data', {exists: exists});
+      })
+      .then(function (args_) {
+        args = args_;
+      });
+    });
+
+    it('then()에 여러개의 arg를 받을 수 있다.', function () {
+      assert.equal(args.exists, true);
+      assert.equal(args.data, 'Hello World!!\n');
     });
   });
 
