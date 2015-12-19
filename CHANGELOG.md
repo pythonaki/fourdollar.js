@@ -34,3 +34,9 @@
 #### v0.1.5
 
 - [x] node#delivery :: then()에 여러개의 인수 전달.
+
+
+#### v0.1.6
+
+- [x] node#copy :: 파일 복사 구현.
+- [x] Promise function 이름에 _ 를 지우자.

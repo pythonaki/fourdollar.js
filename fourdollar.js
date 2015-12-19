@@ -6,30 +6,13 @@
 
 
 
-var $4 = {
-  unique: {}
-};
+var $4 = {};
 
 
 
 
 
 // ##### 비동기 콜백을 Promise 로 변경.
-//
-// usage:
-// ```js
-// var fs = require('fs');
-// var $4 = require('./fourdollar');
-//
-// var _stat = $4.makePromise(fs.stat);
-// _stat('/Users/naki/.atom/packages/bynote/p-fs.js')
-// .then(function (stats) {
-//   console.log(stats);
-// }).catch(function (err) {
-//   console.log(err.stack);
-// });
-// ```
-// `hasErr`: 콜백 함수의 첫번째 인수가 `error`가 아니라면 `false`전달.
 $4.makePromise = function (func, hasErr) {
   if(typeof hasErr === 'undefined') {
     hasErr = true;
@@ -54,19 +37,6 @@ $4.makePromise = function (func, hasErr) {
 
 
 // ##### 객체를 확장한다.
-//
-// usage:
-// ```js
-// it('객체를 확장할 수 있다.', function () {
-//   var objA = {hello: 'hello', world: 'world'};
-//   var objB = {foo: 'foo', bar: 'bar'};
-//   var extendedObj = $4.extend(objA, objB);
-//   expect(extendedObj.foo).toEqual('foo');
-//   expect(extendedObj.bar).toEqual('bar');
-//   expect(objA.foo).toEqual('foo');
-//   expect(objA.bar).toEqual('bar');
-// });
-// ```
 $4.extend = function() {
 	var options, name, src, copy, copyIsArray, clone,
 		target = arguments[0] || {},
@@ -123,7 +93,7 @@ $4.extend = function() {
 
 
 // ### Node.js에서만 포함되는 라이브러리
-node = function () {
+var node = function () {
   var fs = require('fs');
   var path = require('path');
   var process = require('process');
@@ -132,16 +102,6 @@ node = function () {
   node = {}
 
   // ##### 버퍼들을 하나로 합친다.
-  // ```js
-  // var buf1 = new Buffer('foo');
-  // var buf2 = new Buffer('bar');
-  // var buf3 = new Buffer('!!');
-  //
-  // it('버퍼들을 하나로 합친다.', function () {
-  //   var merge = $4.mergeBuffers(buf1, buf2, buf3);
-  //   expect(merge.toString()).toEqual('foobar!!');
-  // });
-  // ```
   node.mergeBuffers = function () {
     var args = arguments;
     var length = 0;
@@ -161,19 +121,6 @@ node = function () {
 
 
   // ##### 홈디렉토리를 기준으로 resolve path를 만든다.
-  //
-  // ```js
-  // var homeDir = process.env.HOME || process.env.USERPROFILE;
-  //
-  // it('홈디렉토리가 기준이다.', function () {
-  //   expect($4.resolveHome()).toEqual(homeDir);
-  // });
-  //
-  // it('홈디렉토리로 시작하는 path.resolve와 같아야 한다.', function () {
-  //   expect($4.resolveHome('foo', 'bar'))
-  //     .toEqual(path.resolve(homeDir, 'foo', 'bar'));
-  // });
-  // ```
   node.resolveHome = function () {
     // arguments Array 로 변환.
     var args = Array.prototype.slice.call(arguments);
@@ -182,18 +129,7 @@ node = function () {
   }
 
   // ##### 최상위 부터 순차적으로 디렉토리를 만들 수 있다.
-  //
-  // ```js
-  // waitsForPromise(function () {
-  //   return $4._constructDir(path.resolve(__dirname, 'foo/bar'))
-  //   .then(function () {
-  //     return _exists(path.resolve(__dirname, 'foo/bar'));
-  //   }).then(function (exists) {
-  //     expect(exists).toBeTruthy();
-  //   });
-  // });
-  // ```
-  node._constructDir = function (dirPath) {
+  node.constructDir = function (dirPath) {
     var _exists = $4.makePromise(fs.exists, false);
     var _mkdir = $4.makePromise(fs.mkdir);
     var dirNames = path.resolve(dirPath).split(path.sep);
@@ -212,16 +148,7 @@ node = function () {
 
 
   // ##### 원격지에서 data를 가져올 수 있다.
-  //
-  // ```js
-  // waitsForPromise(function () {
-  //   return $4._getRemoteData('https://raw.githubusercontent.com/bynaki/atom.bynote/v0.3/spec/dmp01.txt')
-  //   .then(function (data) {
-  //     expect(data.toString()).toEqual('Hello World!!\n');
-  //   });
-  // });
-  // ```
-  node._getRemoteData = function (uri) {
+  node.getRemoteData = function (uri) {
     var get = null;
     var protocol = url.parse(uri).protocol;
 
@@ -250,18 +177,7 @@ node = function () {
 
 
   // ##### 원격지의 파일을 다운로드한다.
-  //
-  // ```js
-  // waitsForPromise(function () {
-  //   return $4._download(uri, filename)
-  //   .then(function () {
-  //     return _exists(filename);
-  //   }).then(function (exists) {
-  //     expect(exists).toBeTruthy();
-  //   });
-  // });
-  // ```
-  node._download = function (uri, filename) {
+  node.download = function (uri, filename) {
     var get = null;
     var protocol = url.parse(uri).protocol;
     if(protocol === 'http:') {
@@ -285,19 +201,8 @@ node = function () {
 
 
   // ##### 원격지의 파일을 다운로드한다.
-  //
-  // ```js
-  // waitsForPromise(function () {
-  //   return $4._download2(uri, filename)
-  //   .then(function () {
-  //     return _exists(filename);
-  //   }).then(function (exists) {
-  //     expect(exists).toBeTruthy();
-  //   });
-  // });
-  // ```
-  node._download2 = function (uri, filename) {
-    return node._getRemoteData(uri)
+  node.download2 = function (uri, filename) {
+    return node.getRemoteData(uri)
     .then(function (data) {
       var _writeFile = $4.makePromise(fs.writeFile);
       return _writeFile(filename, data);
@@ -305,29 +210,25 @@ node = function () {
   };
 
   // #### then()에 여러개의 인수 전달.
-  // ```js
-  // before(function () {
-  //   return _exists(dmpPath)
-  //   .then(function (exists) {
-  //     return $4._delivery(_readFile(dmpPath), 'data', {exists: exists});
-  //   })
-  //   .then(function (args_) {
-  //     args = args_;
-  //   });
-  // });
-  //
-  // it('then()에 여러개의 arg를 받을 수 있다.', function () {
-  //   assert.equal(args.exists, true);
-  //   assert.equal(args.data, 'Hello World!!\n');
-  // });
-  // ```
-  node._delivery = function (resolve, name, args) {
+  node.delivery = function (resolve, name, args) {
     return resolve
     .then(function (result) {
       args[name] = result;
       return args;
     });
   };
+
+
+  // 파일 copy
+  node.copy = function(src, dest) {
+    var fs = require('fs');
+    fs.readFile = $4.makePromise(fs.readFile);
+    fs.writeFile = $4.makePromise(fs.writeFile);
+    return fs.readFile(src)
+    .then(function(data) {
+      return fs.writeFile(dest, data);
+    });
+  }
 
 
   $4.extend($4, node);
@@ -508,19 +409,6 @@ var assert = function () {
   var assert = {};
 
   // ##### 생성된 함수가 실행되는 지 확일할 수 있다.
-  //
-  // it('실행되지 않았을 때 상태는 초기값과 같아야 한다.', function () {
-  //   var naverCall = $4.createSpy();
-  //   assert.deepEqual(naverCall.wasCalled, false);
-  //   assert.deepEqual(naverCall.count, 0);
-  // });
-  //
-  // it('실행되었을 때 올바른 값을 가져야 한다.', function () {
-  //   var mustCall = $4.createSpy();
-  //   mustCall();
-  //   assert.deepEqual(mustCall.wasCalled, true);
-  //   assert.deepEqual(mustCall.count, 1);
-  // });
   assert.createSpy = function () {
     var spy = function () {
       spy.wasCalled = true;

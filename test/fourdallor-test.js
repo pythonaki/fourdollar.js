@@ -5,16 +5,20 @@
 var assert = require('assert');
 var $4 = require('../fourdollar');
 $4.assert();
-var fs = require('fs');
+var fs = require('fs-extra');
 var path = require('path');
 var process = require('process');
 
+fs.readFile = $4.makePromise(fs.readFile);
+fs.exists = $4.makePromise(fs.exists, false);
+fs.rmdir = $4.makePromise(fs.rmdir);
+fs.unlink = $4.makePromise(fs.unlink);
+fs.remove = $4.makePromise(fs.remove);
+
 describe('fourdollar', function () {
   describe('makePromise()', function () {
-    var _readFile = $4.makePromise(fs.readFile);
-
     it('fs.readFile를 Promise로 변경할 수 있다', function () {
-      return _readFile(path.resolve(__dirname, '../resource/dmp01.txt'))
+      return fs.readFile(path.resolve(__dirname, '../resource/dmp01.txt'))
       .then(function (data) {
         assert.ok(data);
       }).catch(assert.ifError);
@@ -22,7 +26,7 @@ describe('fourdollar', function () {
 
 
     it('catch도 올바르게 수행된다.', function () {
-      return _readFile('sdlkfjsdlkfj.txt')
+      return fs.readFile('sdlkfjsdlkfj.txt')
       .then(function (data) {
         assert.ok(false);
       }).catch(function (e) {
@@ -32,7 +36,7 @@ describe('fourdollar', function () {
 
 
     it('then 인수도 전달받는다.', function () {
-      return _readFile(path.resolve(__dirname, '../resource/dmp01.txt'), {encoding: 'utf-8'})
+      return fs.readFile(path.resolve(__dirname, '../resource/dmp01.txt'), {encoding: 'utf-8'})
       .then(function (data) {
         assert.equal(data, 'Hello World!!\n');
       }).catch(assert.ifError);
@@ -40,14 +44,13 @@ describe('fourdollar', function () {
 
 
     it('catch error 인수도 전달받는다.', function () {
-      return _readFile('sdlfhsldfjlsd.txt')
+      return fs.readFile('sdlfhsldfjlsd.txt')
       .catch(assert.ok);
     });
 
 
     it('error 인수가 없는 비동기도 잘 동작한다.', function () {
-      var _exists = $4.makePromise(fs.exists, false);
-      return _exists('dsaldjfljds.txt')
+      return fs.exists('dsaldjfljds.txt')
       .then(function (exists) {
         assert.equal(exists, false);
       });
@@ -117,29 +120,26 @@ describe('fourdollar', function () {
   // });
 
 
-  describe('node._constructDir()', function () {
-    var _exists = $4.makePromise(fs.exists, false);
-    var _rmdir = $4.makePromise(fs.rmdir);
-
+  describe('node.constructDir()', function () {
     before(function () {
-      return _exists(path.resolve(__dirname, '../tmp/foo/bar'))
+      return fs.exists(path.resolve(__dirname, '../tmp/foo/bar'))
       .then(function (exists) {
         if(exists) {
-          return _rmdir(path.resolve(__dirname, '../tmp/foo/bar'));
+          return fs.rmdir(path.resolve(__dirname, '../tmp/foo/bar'));
         }
       }).then(function () {
-        return _exists(path.resolve(__dirname, '../tmp/foo'));
+        return fs.exists(path.resolve(__dirname, '../tmp/foo'));
       }).then(function (exists) {
         if(exists) {
-          return _rmdir(path.resolve(__dirname, '../tmp/foo'));
+          return fs.rmdir(path.resolve(__dirname, '../tmp/foo'));
         }
       });
     });
 
     it('최상위 부터 순차적으로 디렉토리를 만들수 있다.', function () {
-      return $4._constructDir(path.resolve(__dirname, '../tmp/foo/bar'))
+      return $4.constructDir(path.resolve(__dirname, '../tmp/foo/bar'))
       .then(function () {
-        return _exists(path.resolve(__dirname, '../tmp/foo/bar'));
+        return fs.exists(path.resolve(__dirname, '../tmp/foo/bar'));
       }).then(function (exists) {
         assert.ok(exists);
       });
@@ -147,16 +147,16 @@ describe('fourdollar', function () {
   });
 
 
-  describe('node._getRemoteData()', function () {
+  describe('node.getRemoteData()', function () {
     var catchCallback = $4.createSpy();
 
     before(function () {
-      return $4._getRemoteData('www.naver.com')
+      return $4.getRemoteData('www.naver.com')
       .catch(catchCallback);
     });
 
     it('원격지에서 data를 가져올 수 있다.', function () {
-      return $4._getRemoteData('https://raw.githubusercontent.com/bynaki/fourdollar.js/v0.1/resource/dmp01.txt')
+      return $4.getRemoteData('https://raw.githubusercontent.com/bynaki/fourdollar.js/v0.1/resource/dmp01.txt')
       .then(function (data) {
         assert.equal(data.toString(), 'Hello World!!\n');
       });
@@ -168,25 +168,23 @@ describe('fourdollar', function () {
   });
 
 
-  describe('node._download()', function () {
+  describe('node.download()', function () {
     var uri = 'https://raw.githubusercontent.com/bynaki/fourdollar.js/v0.1/resource/ironman.jpg';
     var filename = path.resolve(__dirname, '../tmp/ironman.jpg');
-    var _exists = $4.makePromise(fs.exists, false);
-    var _unlink = $4.makePromise(fs.unlink);
 
     before(function () {
-      return _exists(filename)
+      return fs.exists(filename)
       .then(function (exists) {
         if(exists) {
-          return _unlink(filename);
+          return fs.unlink(filename);
         }
       });
     })
 
     it('원격지의 파일을 다운로드한다.', function () {
-      return $4._download(uri, filename)
+      return $4.download(uri, filename)
       .then(function () {
-        return _exists(filename);
+        return fs.exists(filename);
       }).then(function (exists) {
         assert.deepEqual(exists, true);
       });
@@ -195,7 +193,7 @@ describe('fourdollar', function () {
 
     it('http:, https: 만 허용된다.', function () {
       var catchCallback = $4.createSpy();
-      return $4._download('www.naver.com', filename)
+      return $4.download('www.naver.com', filename)
       .catch(catchCallback)
       .then(function () {
         assert.ok(catchCallback.wasCalled);
@@ -204,25 +202,23 @@ describe('fourdollar', function () {
   });
 
 
-  describe('node._download2()', function () {
+  describe('node.download2()', function () {
     var uri = 'https://raw.githubusercontent.com/bynaki/fourdollar.js/v0.1/resource/ironman.jpg';
     var filename = path.resolve(__dirname, '../tmp/ironman.jpg');
-    var _exists = $4.makePromise(fs.exists, false);
-    var _unlink = $4.makePromise(fs.unlink);
 
     before(function () {
-      return _exists(filename)
+      return fs.exists(filename)
       .then(function (exists) {
         if(exists) {
-          return _unlink(filename);
+          return fs.unlink(filename);
         }
       });
     })
 
     it('원격지의 파일을 다운로드한다.', function () {
-      return $4._download2(uri, filename)
+      return $4.download2(uri, filename)
       .then(function () {
-        return _exists(filename);
+        return fs.exists(filename);
       }).then(function (exists) {
         assert.deepEqual(exists, true);
       });
@@ -231,7 +227,7 @@ describe('fourdollar', function () {
 
     it('http:, https: 만 허용된다.', function () {
       var catchCallback = $4.createSpy();
-      return $4._download2('www.naver.com', filename)
+      return $4.download2('www.naver.com', filename)
       .catch(catchCallback)
       .then(function () {
         assert.ok(catchCallback.wasCalled);
@@ -240,16 +236,14 @@ describe('fourdollar', function () {
   });
 
 
-  describe('node._delivery', function () {
-    var _exists = $4.makePromise(fs.exists, false);
-    var _readFile = $4.makePromise(fs.readFile);
+  describe('node.delivery', function () {
     var dmpPath = path.resolve(__dirname, '../resource/dmp01.txt');
     var args;
 
     before(function () {
-      return _exists(dmpPath)
+      return fs.exists(dmpPath)
       .then(function (exists) {
-        return $4._delivery(_readFile(dmpPath), 'data', {exists: exists});
+        return $4.delivery(fs.readFile(dmpPath), 'data', {exists: exists});
       })
       .then(function (args_) {
         args = args_;
@@ -259,6 +253,33 @@ describe('fourdollar', function () {
     it('then()에 여러개의 arg를 받을 수 있다.', function () {
       assert.equal(args.exists, true);
       assert.equal(args.data, 'Hello World!!\n');
+    });
+  });
+
+
+  describe('node.copy()', function() {
+    var src = path.resolve(__dirname, '../resource/dmp01.txt');
+    var dest = path.resolve(__dirname, '../tmp/dmp01.txt');
+
+    before(function() {
+      return fs.remove(dest)
+      .then(function() {
+        return $4.copy(src, dest);
+      });
+    });
+
+    it('파일이 복사되어졌다.', function() {
+      return fs.exists(dest)
+      .then(function(exists) {
+        assert.ok(exists);
+      });
+    });
+
+    it('파일 내용이 정확하게 복사되어졌다.', function() {
+      return fs.readFile(dest, {encoding: 'utf-8'})
+      .then(function(data) {
+        assert.equal(data.toString(), 'Hello World!!\n');
+      });
     });
   });
 
