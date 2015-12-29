@@ -4,7 +4,7 @@
 
 var assert = require('assert');
 var $4 = require('../fourdollar');
-$4.assert();
+$4.debug();
 var fs = require('fs-extra');
 var path = require('path');
 var process = require('process');
@@ -71,18 +71,38 @@ describe('fourdollar', function () {
   });
 
 
-  describe('assert.createSpy()', function () {
+  describe('debug.createSpy()', function () {
     it('실행되지 않았을 때 상태는 초기값과 같아야 한다.', function () {
       var naverCall = $4.createSpy();
-      assert.deepEqual(naverCall.wasCalled, false);
-      assert.deepEqual(naverCall.count, 0);
+      assert.equal(naverCall.wasCalled, false);
+      assert.equal(naverCall.count, 0);
     });
 
     it('실행되었을 때 올바른 값을 가져야 한다.', function () {
       var mustCall = $4.createSpy();
       mustCall();
-      assert.deepEqual(mustCall.wasCalled, true);
-      assert.deepEqual(mustCall.count, 1);
+      assert.equal(mustCall.wasCalled, true);
+      assert.equal(mustCall.count, 1);
+    });
+
+    var Klass = function() {
+      this.a = 'hello';
+      this.count = 0;
+    };
+    Klass.prototype.greet = function(who) {
+      return this.a + who + (++this.count);
+    };
+
+    it('원래 function을 대신 실행해 준다.', function() {
+      var obj = new Klass();
+      obj.greet = $4.createSpy(obj, obj.greet);
+      assert.equal(obj.greet('world'), 'helloworld1');
+      assert.equal(obj.greet.wasCalled, true);
+      assert.equal(obj.greet.count, 1);
+      assert.equal(obj.greet.returns[0], 'helloworld1');
+      assert.equal(obj.greet('foobar'), 'hellofoobar2');
+      assert.equal(obj.greet.count, 2);
+      assert.equal(obj.greet.returns[0], 'hellofoobar2');
     });
   });
 
@@ -259,10 +279,10 @@ describe('fourdollar', function () {
 
   describe('node.copy()', function() {
     var src = path.resolve(__dirname, '../resource/dmp01.txt');
-    var dest = path.resolve(__dirname, '../tmp/dmp01.txt');
+    var dest = path.resolve(__dirname, '../tmp/foobar/dmp01.txt');
 
     before(function() {
-      return fs.remove(dest)
+      return fs.remove(path.dirname(dest))
       .then(function() {
         return $4.copy(src, dest);
       });

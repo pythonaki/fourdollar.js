@@ -222,11 +222,15 @@ var node = function () {
   // 파일 copy
   node.copy = function(src, dest) {
     var fs = require('fs');
-    fs.readFile = $4.makePromise(fs.readFile);
-    fs.writeFile = $4.makePromise(fs.writeFile);
-    return fs.readFile(src)
+    var path = require('path');
+    _readFile = $4.makePromise(fs.readFile);
+    _writeFile = $4.makePromise(fs.writeFile);
+    return node.constructDir(path.dirname(dest))
+    .then(function() {
+      return _readFile(src)
+    })
     .then(function(data) {
-      return fs.writeFile(dest, data);
+      return _writeFile(dest, data);
     });
   }
 
@@ -405,29 +409,35 @@ var unique = function () {
 
 
 
-var assert = function () {
-  var assert = {};
+var debug = function () {
+  var debug = {};
 
-  // ##### 생성된 함수가 실행되는 지 확일할 수 있다.
-  assert.createSpy = function () {
+  // ##### 스파이 함수가 실행되는 지 확인할 수 있다.
+  // func 함수를 실행한다.
+  debug.createSpy = function (thisArg, func) {
     var spy = function () {
       spy.wasCalled = true;
       spy.count++;
+      if(func) {
+        spy.returns.unshift(func.apply(thisArg, arguments));
+        return spy.returns[0];
+      }
     }
     spy.wasCalled = false;
     spy.count = 0;
+    spy.returns = [];
 
     return spy;
   };
 
-  $4.extend($4, assert);
-  return assert;
+  $4.extend($4, debug);
+  return debug;
 };
 
 
 
 $4.unique = unique;
-$4.assert = assert;
+$4.debug = debug;
 
 
 if(typeof module === 'object' && typeof module.exports === 'object') { // CommonJS
