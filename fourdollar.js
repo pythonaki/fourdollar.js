@@ -6,30 +6,13 @@
 
 
 
-var $4 = {
-  unique: {}
-};
+var $4 = {};
 
 
 
 
 
 // ##### 비동기 콜백을 Promise 로 변경.
-//
-// usage:
-// ```js
-// var fs = require('fs');
-// var $4 = require('./fourdollar');
-//
-// var _stat = $4.makePromise(fs.stat);
-// _stat('/Users/naki/.atom/packages/bynote/p-fs.js')
-// .then(function (stats) {
-//   console.log(stats);
-// }).catch(function (err) {
-//   console.log(err.stack);
-// });
-// ```
-// `hasErr`: 콜백 함수의 첫번째 인수가 `error`가 아니라면 `false`전달.
 $4.makePromise = function (func, hasErr) {
   if(typeof hasErr === 'undefined') {
     hasErr = true;
@@ -54,19 +37,6 @@ $4.makePromise = function (func, hasErr) {
 
 
 // ##### 객체를 확장한다.
-//
-// usage:
-// ```js
-// it('객체를 확장할 수 있다.', function () {
-//   var objA = {hello: 'hello', world: 'world'};
-//   var objB = {foo: 'foo', bar: 'bar'};
-//   var extendedObj = $4.extend(objA, objB);
-//   expect(extendedObj.foo).toEqual('foo');
-//   expect(extendedObj.bar).toEqual('bar');
-//   expect(objA.foo).toEqual('foo');
-//   expect(objA.bar).toEqual('bar');
-// });
-// ```
 $4.extend = function() {
 	var options, name, src, copy, copyIsArray, clone,
 		target = arguments[0] || {},
@@ -123,7 +93,7 @@ $4.extend = function() {
 
 
 // ### Node.js에서만 포함되는 라이브러리
-node = function () {
+var node = function () {
   var fs = require('fs');
   var path = require('path');
   var process = require('process');
@@ -132,16 +102,6 @@ node = function () {
   node = {}
 
   // ##### 버퍼들을 하나로 합친다.
-  // ```js
-  // var buf1 = new Buffer('foo');
-  // var buf2 = new Buffer('bar');
-  // var buf3 = new Buffer('!!');
-  //
-  // it('버퍼들을 하나로 합친다.', function () {
-  //   var merge = $4.mergeBuffers(buf1, buf2, buf3);
-  //   expect(merge.toString()).toEqual('foobar!!');
-  // });
-  // ```
   node.mergeBuffers = function () {
     var args = arguments;
     var length = 0;
@@ -161,19 +121,6 @@ node = function () {
 
 
   // ##### 홈디렉토리를 기준으로 resolve path를 만든다.
-  //
-  // ```js
-  // var homeDir = process.env.HOME || process.env.USERPROFILE;
-  //
-  // it('홈디렉토리가 기준이다.', function () {
-  //   expect($4.resolveHome()).toEqual(homeDir);
-  // });
-  //
-  // it('홈디렉토리로 시작하는 path.resolve와 같아야 한다.', function () {
-  //   expect($4.resolveHome('foo', 'bar'))
-  //     .toEqual(path.resolve(homeDir, 'foo', 'bar'));
-  // });
-  // ```
   node.resolveHome = function () {
     // arguments Array 로 변환.
     var args = Array.prototype.slice.call(arguments);
@@ -182,18 +129,7 @@ node = function () {
   }
 
   // ##### 최상위 부터 순차적으로 디렉토리를 만들 수 있다.
-  //
-  // ```js
-  // waitsForPromise(function () {
-  //   return $4._constructDir(path.resolve(__dirname, 'foo/bar'))
-  //   .then(function () {
-  //     return _exists(path.resolve(__dirname, 'foo/bar'));
-  //   }).then(function (exists) {
-  //     expect(exists).toBeTruthy();
-  //   });
-  // });
-  // ```
-  node._constructDir = function (dirPath) {
+  node.constructDir = function (dirPath) {
     var _exists = $4.makePromise(fs.exists, false);
     var _mkdir = $4.makePromise(fs.mkdir);
     var dirNames = path.resolve(dirPath).split(path.sep);
@@ -212,16 +148,7 @@ node = function () {
 
 
   // ##### 원격지에서 data를 가져올 수 있다.
-  //
-  // ```js
-  // waitsForPromise(function () {
-  //   return $4._getRemoteData('https://raw.githubusercontent.com/bynaki/atom.bynote/v0.3/spec/dmp01.txt')
-  //   .then(function (data) {
-  //     expect(data.toString()).toEqual('Hello World!!\n');
-  //   });
-  // });
-  // ```
-  node._getRemoteData = function (uri) {
+  node.getRemoteData = function (uri) {
     var get = null;
     var protocol = url.parse(uri).protocol;
 
@@ -250,18 +177,7 @@ node = function () {
 
 
   // ##### 원격지의 파일을 다운로드한다.
-  //
-  // ```js
-  // waitsForPromise(function () {
-  //   return $4._download(uri, filename)
-  //   .then(function () {
-  //     return _exists(filename);
-  //   }).then(function (exists) {
-  //     expect(exists).toBeTruthy();
-  //   });
-  // });
-  // ```
-  node._download = function (uri, filename) {
+  node.download = function (uri, filename) {
     var get = null;
     var protocol = url.parse(uri).protocol;
     if(protocol === 'http:') {
@@ -285,26 +201,41 @@ node = function () {
 
 
   // ##### 원격지의 파일을 다운로드한다.
-  //
-  // ```js
-  // waitsForPromise(function () {
-  //   return $4._download2(uri, filename)
-  //   .then(function () {
-  //     return _exists(filename);
-  //   }).then(function (exists) {
-  //     expect(exists).toBeTruthy();
-  //   });
-  // });
-  // ```
-  node._download2 = function (uri, filename) {
-    return node._getRemoteData(uri)
+  node.download2 = function (uri, filename) {
+    return node.getRemoteData(uri)
     .then(function (data) {
       var _writeFile = $4.makePromise(fs.writeFile);
       return _writeFile(filename, data);
     });
   };
 
+  // #### then()에 여러개의 인수 전달.
+  node.delivery = function (resolve, name, args) {
+    return resolve
+    .then(function (result) {
+      args[name] = result;
+      return args;
+    });
+  };
 
+
+  // 파일 copy
+  node.copy = function(src, dest) {
+    var fs = require('fs');
+    var path = require('path');
+    _readFile = $4.makePromise(fs.readFile);
+    _writeFile = $4.makePromise(fs.writeFile);
+    return node.constructDir(path.dirname(dest))
+    .then(function() {
+      return _readFile(src)
+    })
+    .then(function(data) {
+      return _writeFile(dest, data);
+    });
+  }
+
+
+  $4.extend($4, node);
   return node;
 };
 
@@ -472,24 +403,53 @@ var unique = function () {
     return Date.now().toString(radix);
   };
 
+  $4.extend($4, unique);
   return unique;
 };
 
 
 
-$4.unique = unique();
-$4.extend($4, $4.unique);
+var debug = function () {
+  var debug = {};
+
+  // ##### 스파이 함수가 실행되는 지 확인할 수 있다.
+  // func 함수를 실행한다.
+  debug.createSpy = function (thisArg, func) {
+    var spy = function () {
+      spy.wasCalled = true;
+      spy.count++;
+      if(func) {
+        spy.returns.unshift(func.apply(thisArg, arguments));
+        return spy.returns[0];
+      }
+    }
+    spy.wasCalled = false;
+    spy.count = 0;
+    spy.returns = [];
+    spy.func = func;
+
+    return spy;
+  };
+
+  $4.extend($4, debug);
+  return debug;
+};
+
+
+
+$4.unique = unique;
+$4.debug = debug;
+
 
 if(typeof module === 'object' && typeof module.exports === 'object') { // CommonJS
-  $4.node = node();
-  $4.extend($4, $4.node);
+  $4.node = node;
   module.exports = $4;
 } else if(typeof define === 'function' && define.amd) {                // AMD
   define([], function() { return $4; });
 } else if(typeof window !== 'undefined') {                             // Browser
   window.$4 = $4;
 } else {
-  throw Error('sh1 requires a CommonJS or a AMD or a window.');
+  throw Error('fourdollar requires a CommonJS or a AMD or a window.');
 }
 
 
