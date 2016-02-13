@@ -26,6 +26,12 @@ gulp.task('default', ['mocha', 'watch']);
 gulp.task('release', () => {
   var fourdollar = path.resolve(__dirname, 'fourdollar.js');
   var libGitnote = path.resolve(__dirname, '../lib-gitnote/lib/fourdollar.js');
+  var atomGitnote = path.resolve(__dirname, '../../Atom/atom-gitnote/lib/fourdollar.js');
+  var test = path.resolve(__dirname, '../test/fourdollar.js');
   console.log('lib-gitnote release..');
-  return $4.copy(fourdollar, libGitnote);
+  $4.copy(fourdollar, libGitnote);
+  console.log('atom-gitnote release..');
+  $4.copy(fourdollar, atomGitnote);
+  console.log('test release..');
+  $4.copy(fourdollar, test);
 });

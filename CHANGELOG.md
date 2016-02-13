@@ -44,3 +44,10 @@
   function을 대신 실행하고 결과 값을 저장해 둔다.
 - [x] debug#createSpy(): 결과 값 저장할때 unshift 순으로 저장한다.
   고로 가장 최근 저장된 결과 값은 returns[0]일 것이다.
+
+
+#### v0.1.7
+
+- [x] gulpfile.js: atom.GitNote를 위한 release 추가.
+- [x] gulpfile.js: test를 위한 release 추가.
+- [x] debug.createSpy(): func 저장.

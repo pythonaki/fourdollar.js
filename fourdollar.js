@@ -426,6 +426,7 @@ var debug = function () {
     spy.wasCalled = false;
     spy.count = 0;
     spy.returns = [];
+    spy.func = func;
 
     return spy;
   };
