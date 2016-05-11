@@ -11,7 +11,6 @@ var $4 = {};
 
 
 
-
 // ##### 비동기 콜백을 Promise 로 변경.
 $4.makePromise = function (func, hasErr) {
   if(typeof hasErr === 'undefined') {
@@ -34,6 +33,12 @@ $4.makePromise = function (func, hasErr) {
     });
   }
 };
+
+
+// 얕은 복사
+$4.clone = function(obj) {
+  return $4.extend({}, obj);
+}
 
 
 // ##### 객체를 확장한다.

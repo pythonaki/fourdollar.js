@@ -51,3 +51,9 @@
 - [x] gulpfile.js: atom.GitNote를 위한 release 추가.
 - [x] gulpfile.js: test를 위한 release 추가.
 - [x] debug.createSpy(): func 저장.
+
+
+#### v0.1.8
+
+- [x] clone(): 객체 얕은 복사.
+

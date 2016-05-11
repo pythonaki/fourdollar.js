@@ -58,6 +58,26 @@ describe('fourdollar', function () {
   });
 
 
+  describe('clone()', function() {
+    var obj1 = {
+      name: 'foo',
+      child: {name: 'hello'}
+    };
+    var obj2 = $4.clone(obj1);
+    obj1.name = 'bar';
+    obj1.child.name = 'world';
+
+    it('얕은 복사한다', function() {
+      assert.equal(obj2.name, 'foo');
+    });
+
+    it('얕은 복사이므로 자식 객체는 가냥 참조이다.', function() {
+      assert.equal(obj2.child.name, 'world');
+    });
+    console.log(obj2);
+  });
+
+
   describe('extend()', function () {
     it('객체를 확장할 수 있다.', function () {
       var objA = {hello: 'hello', world: 'world'};
