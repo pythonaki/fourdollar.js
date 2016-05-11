@@ -4,7 +4,7 @@
   "dependencies": {},
   "devDependencies": {
     "fs-extra": "^0.26.3",
-    "gulp": "^3.9.0",
+    "gulp": "^3.9.1",
     "gulp-spawn-mocha": "^2.2.1",
     "mocha": "^2.3.4"
   }

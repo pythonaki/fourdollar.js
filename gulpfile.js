@@ -28,10 +28,14 @@ gulp.task('release', () => {
   var libGitnote = path.resolve(__dirname, '../lib-gitnote/lib/fourdollar.js');
   var atomGitnote = path.resolve(__dirname, '../../Atom/atom-gitnote/lib/fourdollar.js');
   var test = path.resolve(__dirname, '../test/fourdollar.js');
-  console.log('lib-gitnote release..');
-  $4.copy(fourdollar, libGitnote);
-  console.log('atom-gitnote release..');
-  $4.copy(fourdollar, atomGitnote);
-  console.log('test release..');
-  $4.copy(fourdollar, test);
+  var libGitHub = path.resolve(__dirname, '../lib-github.electron/src/fourdollar.js');
+  // console.log('lib-gitnote release..');
+  // $4.copy(fourdollar, libGitnote);
+  // console.log('atom-gitnote release..');
+  // $4.copy(fourdollar, atomGitnote);
+  // console.log('test release..');
+  // $4.copy(fourdollar, test);
+  console.log('lib-github release..');
+  $4.copy(fourdollar, libGitHub);
 });
+

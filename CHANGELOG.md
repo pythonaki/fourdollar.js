@@ -57,3 +57,10 @@
 
 - [x] clone(): 객체 얕은 복사.
 
+
+#### v0.1.9
+
+- [x] fourdollar.js: clone(): expand()를 활용해 다시작성.
+- [x] glupfile.js: release task lib-github만.
+- [x] fourdallor-test.js: clone() test 추가.
+
